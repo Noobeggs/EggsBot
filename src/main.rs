@@ -89,8 +89,8 @@ pub async fn poise(
         .intents(
             serenity::GatewayIntents::non_privileged() | serenity::GatewayIntents::MESSAGE_CONTENT,
         )
-        .run()
+        .build()
         .await
-        .unwrap();
+        .map_err(shuttle_runtime::CustomError::new)?;
     Ok(framework.into())
 }
