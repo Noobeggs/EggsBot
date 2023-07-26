@@ -1,0 +1,17 @@
+[package]
+name = "discord-bot-rs"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+dotenvy = "0.15.7"
+env_logger = "0.10.0"
+poise = "0.5.5"
+tokio = { version = "1.29.1", features = ["rt-multi-thread"] }
+
+[dependencies.serenity]
+default-features = false
+features = ["builder", "client", "gateway", "model", "utils", "collector"]
+version = "0.11.6"
