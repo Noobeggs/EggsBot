@@ -5,7 +5,7 @@ mod commands;
 use anyhow::anyhow;
 
 use poise::serenity_prelude as serenity;
-use std::{collections::HashMap, env::var, sync::Mutex, time::Duration};
+use std::time::Duration;
 
 use shuttle_runtime;
 use shuttle_secrets::SecretStore;
@@ -34,7 +34,6 @@ async fn on_error(error: poise::FrameworkError<'_, Data, Error>) {
 pub async fn poise(
     #[shuttle_secrets::Secrets] secret_store: SecretStore,
 ) -> ShuttlePoise<Data, Error> {
-    env_logger::init();
     let discord_token = if let Some(token) = secret_store.get("DISCORD_TOKEN") {
         token
     } else {
