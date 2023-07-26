@@ -6,9 +6,13 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+anyhow = "1.0.72"
 dotenvy = "0.15.7"
 env_logger = "0.10.0"
 poise = "0.5.5"
+shuttle-poise = "0.21.0"
+shuttle-runtime = "0.21.0"
+shuttle-secrets = "0.21.0"
 tokio = { version = "1.29.1", features = ["rt-multi-thread"] }
 
 [dependencies.serenity]

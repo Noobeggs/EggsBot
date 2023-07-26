@@ -2,8 +2,14 @@
 
 mod commands;
 
+use anyhow::anyhow;
+
 use poise::serenity_prelude as serenity;
 use std::{collections::HashMap, env::var, sync::Mutex, time::Duration};
+
+use shuttle_runtime;
+use shuttle_secrets::SecretStore;
+use shuttle_poise::ShuttlePoise;
 
 type Error = Box<dyn std::error::Error + Send + Sync>;
 type Context<'a> = poise::Context<'a, Data, Error>;
@@ -24,10 +30,16 @@ async fn on_error(error: poise::FrameworkError<'_, Data, Error>) {
     }
 }
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>>{
-    dotenvy::dotenv()?;
+#[shuttle_runtime::main]
+pub async fn poise(
+    #[shuttle_secrets::Secrets] secret_store: SecretStore,
+) -> ShuttlePoise<Data, Error> {
     env_logger::init();
+    let discord_token = if let Some(token) = secret_store.get("DISCORD_TOKEN") {
+        token
+    } else {
+            return Err(anyhow!("'DISCORD_TOKEN' was not found").into());
+    };
 
     let options = poise::FrameworkOptions {
         commands: vec![
@@ -64,11 +76,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
         ..Default::default()
     };
 
-    poise::Framework::builder()
-        .token(
-            var("DISCORD_TOKEN")
-                .expect("Missing `DISCORD_TOKEN` env var, see README for more information."),
-        )
+    let framework = poise::Framework::builder()
+        .token(discord_token)
         .setup(move |ctx, _ready, framework| {
             Box::pin(async move {
                 println!("Logged in as {}", _ready.user.name);
@@ -83,5 +92,5 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
         .run()
         .await
         .unwrap();
-    Ok(())
+    Ok(framework.into())
 }

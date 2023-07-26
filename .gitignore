@@ -15,3 +15,7 @@ Cargo.lock
 
 # .env
 .env
+
+# Shuttle.rs Secrets
+Secrets.toml
+Secrets.dev.toml
