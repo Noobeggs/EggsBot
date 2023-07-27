@@ -34,6 +34,7 @@ jobs:
         run: echo "DISCORD_TOKEN = '${{secrets.discord_token}}'" > Secrets.toml
         
       - name: Start project
+        continue-on-error: true
         run: cargo shuttle project start --idle-minutes 0
       
       - name: Deploy to shuttle.rs
