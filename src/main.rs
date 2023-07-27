@@ -2,7 +2,7 @@
 
 mod commands;
 
-use anyhow::anyhow;
+use anyhow::Context as _;
 
 use poise::serenity_prelude as serenity;
 use std::time::Duration;
@@ -12,7 +12,7 @@ use shuttle_secrets::SecretStore;
 use shuttle_poise::ShuttlePoise;
 
 type Error = Box<dyn std::error::Error + Send + Sync>;
-type Context<'a> = poise::Context<'a, Data, Error>;
+// type Context<'a> = poise::Context<'a, Data, Error>;
 
 pub struct Data {}
 
@@ -34,17 +34,14 @@ async fn on_error(error: poise::FrameworkError<'_, Data, Error>) {
 pub async fn poise(
     #[shuttle_secrets::Secrets] secret_store: SecretStore,
 ) -> ShuttlePoise<Data, Error> {
-    let discord_token = if let Some(token) = secret_store.get("DISCORD_TOKEN") {
-        token
-    } else {
-            return Err(anyhow!("'DISCORD_TOKEN' was not found").into());
-    };
+    let discord_token = secret_store
+        .get("DISCORD_TOKEN")
+        .context("'DISCORD_TOKEN' was not found")?;
 
     let options = poise::FrameworkOptions {
         commands: vec![
             commands::mihoyo::genshin_codes(),
             commands::mihoyo::starrail_codes(),
-            // commands::getvotes(),
         ],
         prefix_options: poise::PrefixFrameworkOptions {
             prefix: Some("!".into()),
