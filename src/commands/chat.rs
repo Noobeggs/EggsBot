@@ -47,14 +47,15 @@ pub async fn uwuify_context_menu(
 #[poise::command(prefix_command, aliases("uwu"))]
 pub async fn uwuify(
     ctx: poise::Context<'_, Data, Error>,
-    new_message: serenit::Message,
 ) -> Result<(), Error> {
     // If there is a referenced message, uwuify it!
-    if let Some(boxed_message) = new_message.referenced_message {
-        let quote = boxed_message.content;
-        let _ = say_reply(ctx, uwuify_str_sse(&quote)).await;
-    } else {
-        let _ = say_reply(ctx, "Please reference a message to uwuify (´ ꒳ ` ✿)").await;
+    if let poise::Context::Prefix(prefix_context) = ctx {
+        if let Some(boxed_message) = &prefix_context.msg.referenced_message {
+            let quote = &boxed_message.content;
+            let _ = say_reply(ctx, uwuify_str_sse(&quote)).await;
+        } else {
+            let _ = say_reply(ctx, "Please reply to a message to uwuify (´ ꒳ ` ✿)").await;
+        }
     }
     Ok(())
 }
