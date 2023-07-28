@@ -5,6 +5,7 @@ mod commands;
 use anyhow::Context as _;
 
 use poise::serenity_prelude as serenity;
+use poise::event::Event;
 use std::time::Duration;
 
 use shuttle_runtime;
@@ -42,14 +43,13 @@ pub async fn poise(
         commands: vec![
             commands::mihoyo::genshin_codes(),
             commands::mihoyo::starrail_codes(),
+            commands::chat::uwuify(),
+            commands::chat::uwuify_context_menu(),
         ],
         prefix_options: poise::PrefixFrameworkOptions {
             prefix: Some("!".into()),
             edit_tracker: Some(poise::EditTracker::for_timespan(Duration::from_secs(3600))),
-            additional_prefixes: vec![
-                poise::Prefix::Literal("hey bot"),
-                poise::Prefix::Literal("hey bot,"),
-            ],
+            // additional_prefixes: vec![],
             ..Default::default()
         },
         on_error: |error| Box::pin(on_error(error)),
@@ -63,9 +63,17 @@ pub async fn poise(
                 println!("Executed command {}...", ctx.command().qualified_name);
             })
         },
-        event_handler: |_ctx, event, _framework, _data| {
+        event_handler: |ctx, event, _framework, _data| {
             Box::pin(async move {
                 println!("Got an event in event handler: {:?}", event.name());
+                match event {
+                    Event::Message { new_message }=> {
+                        if !new_message.author.bot {
+                            let _ = commands::chat::scan_message(ctx.clone(), new_message.clone()).await;
+                        }
+                    },
+                    _ => ()
+                }
                 Ok(())
             })
         },
