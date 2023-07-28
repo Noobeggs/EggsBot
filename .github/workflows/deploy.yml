@@ -25,6 +25,7 @@ jobs:
         run: cargo list
         
       - name: Install shuttle
+        continue-on-error: true
         run: cargo install cargo-shuttle
       
       - name: Login to shuttle.rs
