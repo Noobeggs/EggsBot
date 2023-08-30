@@ -125,7 +125,7 @@ fn genshin_redeem_url_button(code: String) -> serenit::CreateButton {
 
 fn starrail_redeem_url_button(code: String) -> serenit::CreateButton {
     let mut b = serenit::CreateButton::default();
-    b.url(format!("https://hsr.hoyoverse.com/en/gift?code={}", &code));
+    b.url(format!("https://hsr.hoyoverse.com/gift?code={}", &code));
     b.label(code);
     b.style(serenit::ButtonStyle::Link);
     b
