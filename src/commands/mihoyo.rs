@@ -96,6 +96,15 @@ pub async fn starrail_codes(
             .embed(|b| b.description(description)
                 .title("Honkai: Star Rail Codes")
                 .colour(Colour::BLITZ_BLUE))
+                .components(|b| {
+                    b.create_action_row(|b| {
+                        for i in 0..no_of_codes {
+                            let code = codes_vec[i].clone();
+                            b.add_button(starrail_redeem_url_button(code));
+                        };
+                        return b;
+                    })
+                })
     })
     .await?;
     Ok(())
@@ -109,6 +118,14 @@ fn extract_codes_from_string(input: String) -> Vec<String> {
 fn genshin_redeem_url_button(code: String) -> serenit::CreateButton {
     let mut b = serenit::CreateButton::default();
     b.url(format!("https://genshin.hoyoverse.com/en/gift?code={}", &code));
+    b.label(code);
+    b.style(serenit::ButtonStyle::Link);
+    b
+}
+
+fn starrail_redeem_url_button(code: String) -> serenit::CreateButton {
+    let mut b = serenit::CreateButton::default();
+    b.url(format!("https://hsr.hoyoverse.com/en/gift?code={}", &code));
     b.label(code);
     b.style(serenit::ButtonStyle::Link);
     b
