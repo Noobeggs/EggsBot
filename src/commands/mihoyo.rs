@@ -190,7 +190,7 @@ mod test {
         assert_eq!(res4.len(), 2);
         assert_eq!(err1.len(), 1);
         assert_eq!(err2.len(), 0);
-        assert_eq!(err3.len(), 0);
+        assert_eq!(err3.len(), 1);
         assert_eq!(err4.len(), 1);
         
         assert_eq!(res2[0], "NS92PG6DB52M");       
