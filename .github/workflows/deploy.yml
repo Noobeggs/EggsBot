@@ -35,7 +35,7 @@ jobs:
         run: echo "DISCORD_TOKEN = '${{secrets.discord_token}}'" > Secrets.toml
 
       - name: Add Llama_url to Secrets.toml
-        run: echo "LLAMA_URL" = '${{secrets.llama_url}}'" > Secrets.toml
+        run: echo "LLAMA_URL = '${{secrets.llama_url}}'" >> Secrets.toml
         
       - name: Start project
         continue-on-error: true
