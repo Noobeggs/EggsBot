@@ -1,7 +1,7 @@
 use crate::Error;
 use crate::Data;
 use poise::serenity_prelude as serenit;
-use serenity::utils::{Colour};
+use serenity::utils::Colour;
 
 #[poise::command(slash_command)]
 pub async fn genshin_codes(
