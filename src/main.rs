@@ -1,22 +1,19 @@
 #![warn(clippy::str_to_string)]
 
 mod commands;
-pub mod singletons {
-    pub static HTTP_CLIENT: reqwest::Client = reqwest::Client::new();
-}
 
 use poise::serenity_prelude as serenity;
 use poise::event::Event;
 use std::collections::BTreeMap;
 use std::time::Duration;
-
-use std::{collections::HashMap, env::var, sync::Mutex, time::Duration};
+use std::env::var;
 
 type Error = Box<dyn std::error::Error + Send + Sync>;
 type Context<'a> = poise::Context<'a, Data, Error>;
 
 pub struct Data {
     secrets: BTreeMap<String, String>,
+    http_client: reqwest::Client,
 }
 
 
@@ -50,6 +47,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
             commands::mihoyo::starrail_codes(),
             commands::chat::uwuify(),
             commands::chat::uwuify_context_menu(),
+            commands::llama::llama(),
         ],
         prefix_options: poise::PrefixFrameworkOptions {
             prefix: Some("!".into()),
@@ -96,6 +94,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
                 Ok(Data {
                     secrets: global_map,
+                    http_client: reqwest::Client::new(),
                 })
             })
         })
