@@ -1,11 +1,15 @@
 #![warn(clippy::str_to_string)]
 
 mod commands;
+pub mod singletons {
+    pub static HTTP_CLIENT: reqwest::Client = reqwest::Client::new();
+}
 
 use anyhow::Context as _;
 
 use poise::serenity_prelude as serenity;
 use poise::event::Event;
+use std::collections::BTreeMap;
 use std::time::Duration;
 
 use shuttle_runtime;
@@ -15,7 +19,10 @@ use shuttle_poise::ShuttlePoise;
 type Error = Box<dyn std::error::Error + Send + Sync>;
 // type Context<'a> = poise::Context<'a, Data, Error>;
 
-pub struct Data {}
+pub struct Data {
+    secrets: BTreeMap<String, String>,
+}
+
 
 async fn on_error(error: poise::FrameworkError<'_, Data, Error>) {
     match error {
@@ -39,6 +46,13 @@ pub async fn poise(
         .get("DISCORD_TOKEN")
         .context("'DISCORD_TOKEN' was not found")?;
 
+    let llama_url = secret_store
+        .get("LLAMA_URL")
+        .context("'LLAMA_URL' was not found")?;
+
+    let mut global_map: std::collections::btree_map::BTreeMap<String, String> = std::collections::BTreeMap::new();
+    global_map.insert("llama_url".to_string(), llama_url);
+
     let options = poise::FrameworkOptions {
         commands: vec![
             commands::mihoyo::genshin_codes(),
@@ -58,6 +72,13 @@ pub async fn poise(
                 println!("Executing command {}...", ctx.command().qualified_name);
             })
         },
+        command_check: Some(|ctx| {
+            Box::pin(async move {
+                ctx.set_invocation_data("test").await;
+
+                Ok(true)
+            })
+        }),
         post_command: |ctx| {
             Box::pin(async move {
                 println!("Executed command {}...", ctx.command().qualified_name);
@@ -86,7 +107,9 @@ pub async fn poise(
             Box::pin(async move {
                 println!("Logged in as {}", _ready.user.name);
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
-                Ok(Data {})
+                Ok(Data {
+                    secrets: global_map,
+                })
             })
         })
         .options(options)
