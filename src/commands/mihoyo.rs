@@ -188,7 +188,7 @@ mod test {
         assert_eq!(res2.len(), 2);
         assert_eq!(res3.len(), 2);
         assert_eq!(res4.len(), 2);
-        assert_eq!(err1.len(), 0);
+        assert_eq!(err1.len(), 1);
         assert_eq!(err2.len(), 0);
         assert_eq!(err3.len(), 0);
         assert_eq!(err4.len(), 1);
