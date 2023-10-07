@@ -1,9 +1,6 @@
 #![warn(clippy::str_to_string)]
 
 mod commands;
-pub mod singletons {
-    pub static HTTP_CLIENT: reqwest::Client = reqwest::Client::new();
-}
 
 use anyhow::Context as _;
 
@@ -21,6 +18,7 @@ type Error = Box<dyn std::error::Error + Send + Sync>;
 
 pub struct Data {
     secrets: BTreeMap<String, String>,
+    http_client: reqwest::Client,
 }
 
 
@@ -59,6 +57,7 @@ pub async fn poise(
             commands::mihoyo::starrail_codes(),
             commands::chat::uwuify(),
             commands::chat::uwuify_context_menu(),
+            commands::llama::llama(),
         ],
         prefix_options: poise::PrefixFrameworkOptions {
             prefix: Some("!".into()),
@@ -109,6 +108,7 @@ pub async fn poise(
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
                 Ok(Data {
                     secrets: global_map,
+                    http_client: reqwest::Client::new(),
                 })
             })
         })
