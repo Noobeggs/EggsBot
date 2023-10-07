@@ -1,14 +1,24 @@
 #![warn(clippy::str_to_string)]
 
 mod commands;
+pub mod singletons {
+    pub static HTTP_CLIENT: reqwest::Client = reqwest::Client::new();
+}
 
 use poise::serenity_prelude as serenity;
+use poise::event::Event;
+use std::collections::BTreeMap;
+use std::time::Duration;
+
 use std::{collections::HashMap, env::var, sync::Mutex, time::Duration};
 
 type Error = Box<dyn std::error::Error + Send + Sync>;
 type Context<'a> = poise::Context<'a, Data, Error>;
 
-pub struct Data {}
+pub struct Data {
+    secrets: BTreeMap<String, String>,
+}
+
 
 async fn on_error(error: poise::FrameworkError<'_, Data, Error>) {
     match error {
@@ -28,6 +38,11 @@ async fn on_error(error: poise::FrameworkError<'_, Data, Error>) {
 async fn main() -> Result<(), Box<dyn std::error::Error>>{
     dotenvy::dotenv()?;
     env_logger::init();
+
+    let llama_url = var("LLAMA_URL").expect("Missing `LLAMA_URL` env var, see README for more information.");
+
+    let mut global_map: std::collections::btree_map::BTreeMap<String, String> = std::collections::BTreeMap::new();
+    global_map.insert("llama_url".to_string(), llama_url);
 
     let options = poise::FrameworkOptions {
         commands: vec![
@@ -79,7 +94,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
             Box::pin(async move {
                 println!("Logged in as {}", _ready.user.name);
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
-                Ok(Data {})
+                Ok(Data {
+                    secrets: global_map,
+                })
             })
         })
         .options(options)
